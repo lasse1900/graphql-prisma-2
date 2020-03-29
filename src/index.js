@@ -6,6 +6,7 @@ import Mutation from './resolvers/Mutation'
 import Post from './resolvers/Post'
 import Comment from './resolvers/Comment'
 import User from './resolvers/User'
+import './prisma'
 
 // Scalar types - String, Boolean, Int, Float, ID
 
