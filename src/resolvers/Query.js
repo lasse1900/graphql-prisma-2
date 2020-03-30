@@ -1,47 +1,51 @@
 const Query = {
   users(parent, args, { prisma }, info) {
-      return prisma.query.users(null, info)
+    const opArgs = {}
 
-      // nothing, string, object
-      
-      // if (!args.query) {
-      //     return db.users
-      // }
+    if (args.query) {
+      opArgs.where = {
+        OR: [{
+          name_contains: args.query
+        }, {
+          email_contains: args.query
+        }]
+      }
+    }
 
-      // return db.users.filter((user) => {
-      //     return user.name.toLowerCase().includes(args.query.toLowerCase())
-      // })
+    return prisma.query.users(opArgs, info)
   },
   posts(parent, args, { prisma }, info) {
-      return prisma.query.posts(null, info)
+    const opArgs = {}
 
-      // if (!args.query) {
-      //     return db.posts
-      // }
+    if (args.query) {
+      opArgs.where = {
+        OR: [{
+          title_contains: args.query
+        }, {
+          body_contains: args.query
+        }]
+      }
+    }
 
-      // return db.posts.filter((post) => {
-      //     const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
-      //     const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
-      //     return isTitleMatch || isBodyMatch
-      // })
+    return prisma.query.posts(opArgs, info)
   },
   comments(parent, args, { db }, info) {
-      return db.comments
+    return db.comments
   },
   me() {
-      return {
-          id: '123098',
-          name: 'Mike',
-          email: 'mike@example.com'
-      }
+    return {
+      id: '123098',
+      name: 'Mike',
+      email: 'mike@example.com'
+    }
   },
   post() {
-      return {
-          id: '092',
-          title: 'GraphQL 101',
-          body: '',
-          published: false
-      }
+    return {
+      id: '092',
+      title: 'GraphQL 101',
+      body: '',
+      published: false
+    }
   }
 }
 
