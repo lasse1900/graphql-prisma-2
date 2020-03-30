@@ -6,7 +6,7 @@ import Mutation from './resolvers/Mutation'
 import Post from './resolvers/Post'
 import Comment from './resolvers/Comment'
 import User from './resolvers/User'
-import './prisma'
+import prisma from './prisma'
 
 // Scalar types - String, Boolean, Int, Float, ID
 
@@ -24,7 +24,8 @@ const server = new GraphQLServer({
   },
   context: {
     db,
-    pubsub
+    pubsub,
+    prisma
   }
 })
 
