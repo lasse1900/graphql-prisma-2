@@ -2,6 +2,9 @@ import uuidv4 from 'uuid/v4'
 
 const Mutation = {
   async createUser(parent, args, { prisma }, info) {
+    if (args.data.password.length < 8) {
+      throw new Error('Password must be atleast 8 chars long')
+    }
     return prisma.mutation.createUser({ data: args.data }, info)
   },
   async deleteUser(parent, args, { prisma }, info) {
