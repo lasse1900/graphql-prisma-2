@@ -1,43 +1,27 @@
-import { v4 as uuidv4 } from 'uuid'
+import uuidv4 from 'uuid/v4'
 
 const Mutation = {
-  createUser(parent, args, { db }, info) {
-    const emailTaken = db.users.some((user) => user.email === args.email)
+  async createUser(parent, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email })
 
     if (emailTaken) {
-      throw new Error('email taken')
+      throw new Error('Email taken')
     }
 
-    const user = {
-      id: uuidv4(),
-      ...args
-    }
-    db.users.push(user)
-
-    return user
+    return prisma.mutation.createUser({ data: args.data }, info)
   },
-  deleteUser(parent, args, { db }, info) {
-    const userIndex = db.users.findIndex((user) => user.id === args.id)
+  async deleteUser(parent, args, { prisma }, info) {
+    const userExists = await prisma.exists.User({ id: args.id })
 
-    if (userIndex === -1) {
+    if (!userExists) {
       throw new Error('User not found')
     }
 
-    const deletedUsers = db.users.splice(userIndex, 1)
-
-    db.posts = db.posts.filter((post) => {
-      const match = post.author === args.id
-
-      if (match) {
-        db.comments = db.comments.filter((comment) => comment.post !== post.id)
+    return prisma.mutation.deleteUser({
+      where: {
+        id: args.id
       }
-
-      return !match
-    })
-    db.comments = db.comments.filter((comment) => comment.author !== args.id)
-
-    return deletedUsers[0]
-
+    }, info)
   },
   updateUser(parent, args, { db }, info) {
     const { id, data } = args
@@ -78,6 +62,7 @@ const Mutation = {
       id: uuidv4(),
       ...args.data
     }
+
     db.posts.push(post)
 
     if (args.data.published) {
@@ -112,7 +97,6 @@ const Mutation = {
     }
 
     return post
-
   },
   updatePost(parent, args, { db, pubsub }, info) {
     const { id, data } = args
@@ -165,13 +149,14 @@ const Mutation = {
     const postExists = db.posts.some((post) => post.id === args.data.post && post.published)
 
     if (!userExists || !postExists) {
-      throw new Error('User or Post not found')
+      throw new Error('Unable to find user and post')
     }
 
     const comment = {
       id: uuidv4(),
       ...args.data
     }
+
     db.comments.push(comment)
     pubsub.publish(`comment ${args.data.post}`, {
       comment: {
@@ -190,7 +175,6 @@ const Mutation = {
     }
 
     const [deletedComment] = db.comments.splice(commentIndex, 1)
-
     pubsub.publish(`comment ${deletedComment.post}`, {
       comment: {
         mutation: 'DELETED',
