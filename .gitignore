@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 /playground
+/config
 
 # testing
 /coverage
