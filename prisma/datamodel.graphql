@@ -1,16 +1,16 @@
 type User {
-  id: ID! @unique
+  id: ID! @id
   name: String!
   email: String! @unique
   password: String!
   posts: [Post!]! @relation(name: "PostToUser", onDelete: CASCADE)
   comments: [Comment!]! @relation(name: "CommentToUser", onDelete: CASCADE)
-  updatedAt:DateTime!
-  createdAt: DateTime!
+  updatedAt:DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Post {
-  id: ID! @unique
+  id: ID! @id
   title: String!
   body: String!
   published: Boolean!
@@ -19,7 +19,7 @@ type Post {
 }
 
 type Comment {
-  id: ID! @unique
+  id: ID! @id
   text: String!
   author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
   post: Post! @relation(name: "CommentToPost", onDelete: SET_NULL)
